@@ -69,6 +69,29 @@ class Department:
             DELETE FROM departments
             WHERE id = ?
         """
-
         CURSOR.execute(sql, (self.id,))
         CONN.commit()
+        self.id = None  # Set id to None after deletion
+
+    @classmethod
+    def instance_from_db(cls, row):
+        if row:
+            return cls(row[1], row[2], row[0])
+
+    @classmethod
+    def get_all(cls):
+        sql = "SELECT * FROM departments"
+        rows = CURSOR.execute(sql).fetchall()
+        return [cls.instance_from_db(row) for row in rows]
+
+    @classmethod
+    def find_by_id(cls, id):
+        sql = "SELECT * FROM departments WHERE id = ?"
+        row = CURSOR.execute(sql, (id,)).fetchone()
+        return cls.instance_from_db(row)
+
+    @classmethod
+    def find_by_name(cls, name):
+        sql = "SELECT * FROM departments WHERE name = ?"
+        row = CURSOR.execute(sql, (name,)).fetchone()
+        return cls.instance_from_db(row)
